@@ -1,0 +1,38 @@
+[project]
+name = "tp-pipeline"
+version = "0.1.0"
+description = "Trigger Point precompute: terrain, fuels, communities, WindNinja and ELMFIRE runs, web export."
+requires-python = ">=3.11"
+dependencies = [
+    "geopandas>=1.0",
+    "numpy>=2.0",
+    "pyyaml>=6.0",
+    "rasterio>=1.4",
+    "requests>=2.32",
+    "shapely>=2.0",
+    "typer>=0.12",
+    "xarray>=2024.1",
+]
+
+[project.scripts]
+tp = "tp_pipeline.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

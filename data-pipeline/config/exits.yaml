@@ -1,0 +1,19 @@
+# Evacuation exits per community.
+#   lanes: outbound travel lanes usable during an evacuation (integer).
+#
+# TODO(lanes): every lane count is unverified. Confirm from the city Safety Element
+#   Appendix C, OSM `lanes` tags and a field check, and record the source per exit.
+# TODO(exits): these lists are incomplete; add the remaining exits from Appendix C.
+communities:
+  chevy-chase-canyon:
+    name: Chevy Chase Canyon
+    exits:
+      - name: E. Chevy Chase Dr
+        lanes: null # TODO
+        source: null # TODO
+  glenoaks-canyon:
+    name: Glenoaks Canyon
+    exits:
+      - name: Glenoaks Blvd
+        lanes: null # TODO
+        source: null # TODO

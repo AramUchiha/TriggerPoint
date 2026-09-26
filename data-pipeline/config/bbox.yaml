@@ -1,0 +1,7 @@
+# Study area: Glendale, CA, including the Verdugo Mountains and San Rafael Hills.
+# WGS84 decimal degrees. Model runs reproject to UTM 11N (EPSG:32611).
+crs: EPSG:4326
+west: -118.32
+south: 34.12
+east: -118.17
+north: 34.27

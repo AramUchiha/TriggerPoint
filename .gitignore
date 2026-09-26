@@ -1,0 +1,31 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Env files: never commit real values
+.env
+.env.*
+!.env.example
+
+# Node (web/.gitignore covers Next.js specifics)
+node_modules/
+
+# Scenario outputs from the pipeline: only the manifest is committed
+web/public/scenarios/*
+!web/public/scenarios/manifest.json
+
+# Data pipeline
+data-pipeline/raw/*
+!data-pipeline/raw/.gitkeep
+data-pipeline/work/*
+!data-pipeline/work/.gitkeep
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Claude Code local settings
+.claude/settings.local.json

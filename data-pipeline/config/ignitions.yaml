@@ -1,0 +1,10 @@
+# Candidate ignition points for ELMFIRE scenario runs. Intentionally empty:
+# every point must be chosen with a documented rationale, never invented.
+#
+# Schema (one entry per ignition):
+#   - id: verdugo-example-01     # kebab-case, unique; used in output filenames
+#     name: "Human-readable label shown in the UI"
+#     lon: -118.0000             # WGS84 longitude
+#     lat: 34.0000               # WGS84 latitude
+#     rationale: "Why here (historic ignition, roadside, powerline corridor...) and the source"
+ignitions: []

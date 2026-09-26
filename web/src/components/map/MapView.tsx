@@ -14,6 +14,8 @@ import {
   TERRAIN_SOURCE_ID,
   TERRAIN_TILES,
 } from "@/config/map";
+import { FireDragButton } from "./FireDragButton";
+import { ResidentLayers } from "./ResidentLayers";
 
 const TERRAIN = { source: TERRAIN_SOURCE_ID, exaggeration: TERRAIN_EXAGGERATION };
 
@@ -62,6 +64,8 @@ export default function MapView() {
         />
       )}
       <NavigationControl position="top-left" visualizePitch />
+      {styleReady && <ResidentLayers beforeId={labelLayerId} />}
+      <FireDragButton />
     </Map>
   );
 }

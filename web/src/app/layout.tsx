@@ -4,9 +4,9 @@ import "@fontsource-variable/inter";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trigger Point · Glendale FD",
+  title: "Trigger Point",
   description:
-    "Wildfire evacuation pre-incident planning for Glendale canyon neighborhoods. Planning projection, not a forecast.",
+    "Report a wildfire you can see, watch the projected spread once neighbours confirm it, and see where to go. Projection, not a forecast. Call 911 for emergencies.",
   appleWebApp: { capable: true, title: "Trigger Point", statusBarStyle: "black-translucent" },
 };
 

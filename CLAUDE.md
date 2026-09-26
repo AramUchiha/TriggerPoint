@@ -1,21 +1,22 @@
 # Trigger Point
 
-Wildfire evacuation **pre-incident planning** tool for the Glendale (CA) Fire Department.
-It answers one question per canyon neighborhood:
+Resident-facing wildfire app for Glendale (CA) canyon neighborhoods:
 
-> "If a fire starts here, can this neighborhood evacuate before the fire arrives, and
-> where is the trigger line where evacuation must begin?"
+> Open app → see map → drag a fire onto the map where you see one → once enough neighbours
+> report it, see the projected spread → see where to go.
 
-Users are chief officers and planners working on an iPad **before** an incident. It is not
-an incident-management or live-forecast tool.
+Phone-first web app. The current build is a **frontend-only prototype**: no backend, reports
+live in local state, and anything that would come from other residents or the pipeline is
+simulated in demo mode (`?demo=1`). Design: `docs/superpowers/specs/2026-09-26-resident-fire-report-flow-design.md`.
 
-## Chief-facing pitch
+## Safety posture
 
-Before the next Santa Ana wind event, see for each canyon neighborhood how long it takes to
-get everyone out, how fast a fire could reach it under realistic and worst-case winds, and
-the line on the map where the evacuation order must go out if the fire crosses it. It is
-precomputed from established wind and fire-spread models, runs on an iPad without internet,
-and every number shows where it came from.
+- **911 first.** Every report sheet leads with Call 911. Never imply a report alerted anyone.
+- Crowd status is phrased as crowd status: "Reported by N residents" (3+), "Confirmed by N
+  residents" (10+). Never a bare "Confirmed". Rules live in `web/src/lib/clusters.ts`
+  (500 m, 60 min, distinct reporters) and a future backend must enforce the same values.
+- Spread is a projection, not a forecast, and embers can start fires ahead of it. Say so.
+- Never show an exit as "clear" without a spread model; show "status unknown".
 
 ## Core principle: never show fabricated data
 
@@ -30,6 +31,11 @@ and every number shows where it came from.
   reachable from the UI.
 - Approximate config (camera preset centers in `web/src/config/communities.ts`) is marked
   `TODO(verify)` and is never used for analysis.
+- **One exception: demo mode.** Simulated data may exist only in `web/src/demo/`, only reach the
+  UI through `web/src/components/data/DataProvider.tsx` when the URL has `?demo=1`, and only
+  with the "PROTOTYPE · SIMULATED DATA" banner showing. ESLint enforces the import fence.
+  Demo values carry `provenance.source === "demo"`, render in a distinct dashed style, and
+  use obviously synthetic names ("Demo Shelter A"), never real places.
 
 ## Glossary
 
@@ -51,6 +57,11 @@ data-pipeline/ (Python, `tp` CLI)                 web/ (Next.js)
                                                     /api/weather -> api.weather.gov (only live call)
 ```
 
+- The spread engine sits behind `SpreadProvider` (`web/src/lib/spread.ts`). The intended real
+  implementation is in-browser minimum-travel-time on pipeline spread-rate rasters, so a drop
+  anywhere projects instantly and offline. Only the demo provider exists today.
+- Live multi-user reports need a backend (Supabase with PostGIS + realtime was the recommended
+  direction). Not built yet.
 - Static precompute plus a thin client. **No database, no accounts.** Scenario outputs are
   static GeoJSON/JSON/raster files in `web/public/scenarios/` indexed by `manifest.json`
   (only the manifest is committed).
@@ -66,12 +77,14 @@ data-pipeline/ (Python, `tp` CLI)                 web/ (Next.js)
 - `web/`: Next.js 16 App Router, TypeScript strict (+ `noUncheckedIndexedAccess`), Tailwind v4, pnpm.
   - `src/app/`: `layout.tsx`, `page.tsx`, `api/weather/route.ts`.
   - `src/components/map/`: `MapClient` (dynamic import, `ssr: false`), `MapView`,
-    `DeckOverlay`, `CameraController`, `LayerToggles`, `scenario-layers.ts`.
-  - `src/components/panel/`: side panel (Community, Wind Scenario, Fire Projection,
-    Clearance, Verdict). `src/components/ui/`: StatusBar, Clock, Toggle.
+    `ResidentLayers` (native MapLibre layers + markers, which drape on terrain),
+    `FireDragButton`, `DeckOverlay` (unmounted, kept for future raster layers).
+  - `src/components/sheet/`: `BottomSheet`, `ReportSheet`, `ShelterSheet`.
+    `src/components/data/`: `DataProvider` (data sources, demo wiring) and hooks.
+    `src/components/ui/`: StatusBar, Clock, DemoBanner, SafetyFooter, Notice.
+  - `src/demo/`: simulated data for `?demo=1` only.
   - `src/lib/`: pure logic with colocated `*.test.ts`. `src/store/`: zustand `app-store.ts`.
-  - `src/config/`: `map.ts` (the one place for basemap, terrain, and provider; swap via
-    `NEXT_PUBLIC_MAP_PROVIDER`), `communities.ts` (camera presets), `layout.ts`.
+  - `src/config/`: `map.ts` (basemap, terrain, provider), `coverage.ts` (covered bbox from the manifest).
   - `src/types/scenario.ts`: zod contracts for everything the pipeline exports.
 - `data-pipeline/`: Python >=3.11 via uv. `tp` Typer CLI; every command is a stub that prints
   its plan and exits 1. `config/` holds `bbox.yaml`, `ignitions.yaml` (empty on purpose), and
@@ -119,7 +132,7 @@ data-pipeline/ (Python, `tp` CLI)                 web/ (Next.js)
   Time is 24-hour America/Los_Angeles.
 - Map-library code stays in `components/map/`. Other UI talks to the map through the store
   (e.g. `cameraRequest`), which keeps a future Mapbox swap contained.
-- Design: dark slate surfaces. Amber (`warning`) = warning, red (`critical`) = critical, sky
+- Design: phone-first. Dark slate surfaces. Amber (`warning`) = warning, red (`critical`) = critical, sky
   `accent` = interaction only. Inter. Touch targets >=44px. High contrast, readable at arm's
   length on an iPad.
 - Python: ruff + pytest. Every pipeline output gets its provenance written alongside it.

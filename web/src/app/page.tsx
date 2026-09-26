@@ -1,5 +1,6 @@
 import MapClient from "@/components/map/MapClient";
 import { DataProvider } from "@/components/data/DataProvider";
+import { BottomSheet } from "@/components/sheet/BottomSheet";
 import { DemoBanner } from "@/components/ui/DemoBanner";
 import { Notice } from "@/components/ui/Notice";
 import { SafetyFooter } from "@/components/ui/SafetyFooter";
@@ -15,6 +16,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <StatusBar />
         <DemoBanner />
         <Notice />
+        <BottomSheet />
         <SafetyFooter />
       </main>
     </DataProvider>

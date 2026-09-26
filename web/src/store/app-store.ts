@@ -1,40 +1,52 @@
 import { create } from "zustand";
-import type { CommunityId } from "@/config/communities";
+import type { LngLat } from "@/lib/geo";
+import { upsertReport, type Report, type ReportInput } from "@/lib/reports";
 
-export const LAYER_IDS = ["wind", "fireContours", "triggerLine", "communities"] as const;
-export type LayerId = (typeof LAYER_IDS)[number];
-export type LayerVisibility = Record<LayerId, boolean>;
-
-/** A one-shot camera move; `seq` increments so repeated taps on the same preset re-fly. */
-export interface CameraRequest {
-  communityId: CommunityId;
-  seq: number;
-}
+export type SheetId = "none" | "report" | "shelter";
 
 interface AppState {
-  layers: LayerVisibility;
-  toggleLayer: (id: LayerId) => void;
+  reports: Report[];
+  /** The single write path for reports (the user's drop and the demo simulator). Returns the report id. */
+  addReport: (input: ReportInput, nowMs: number) => string;
+  resetReports: () => void;
 
-  panelOpen: boolean;
-  togglePanel: () => void;
+  /** A report in the fire the sheet is about; the cluster is derived from it. */
+  selectedReportId: string | null;
+  sheet: SheetId;
+  openReport: (reportId: string) => void;
+  openShelter: () => void;
+  closeSheet: () => void;
 
-  selectedCommunityId: CommunityId | null;
-  cameraRequest: CameraRequest | null;
-  selectCommunity: (id: CommunityId) => void;
+  userLocation: LngLat | null;
+  setUserLocation: (loc: LngLat | null) => void;
+
+  /** Short transient message, e.g. "Outside the area we cover". */
+  notice: string | null;
+  showNotice: (message: string | null) => void;
 }
 
-export const useAppStore = create<AppState>()((set) => ({
-  layers: { wind: false, fireContours: true, triggerLine: true, communities: true },
-  toggleLayer: (id) => set((s) => ({ layers: { ...s.layers, [id]: !s.layers[id] } })),
+// Counter ids: crypto.randomUUID needs a secure context, which an iPad on LAN http isn't.
+let seq = 0;
+const nextId = () => `r${Date.now().toString(36)}-${(seq++).toString(36)}`;
 
-  panelOpen: true,
-  togglePanel: () => set((s) => ({ panelOpen: !s.panelOpen })),
+export const useAppStore = create<AppState>()((set, get) => ({
+  reports: [],
+  addReport: (input, nowMs) => {
+    const { reports, id } = upsertReport(get().reports, input, nowMs, nextId);
+    set({ reports });
+    return id;
+  },
+  resetReports: () => set({ reports: [], selectedReportId: null, sheet: "none" }),
 
-  selectedCommunityId: null,
-  cameraRequest: null,
-  selectCommunity: (id) =>
-    set((s) => ({
-      selectedCommunityId: id,
-      cameraRequest: { communityId: id, seq: (s.cameraRequest?.seq ?? 0) + 1 },
-    })),
+  selectedReportId: null,
+  sheet: "none",
+  openReport: (reportId) => set({ selectedReportId: reportId, sheet: "report" }),
+  openShelter: () => set({ sheet: "shelter" }),
+  closeSheet: () => set({ sheet: "none" }),
+
+  userLocation: null,
+  setUserLocation: (userLocation) => set({ userLocation }),
+
+  notice: null,
+  showNotice: (notice) => set({ notice }),
 }));

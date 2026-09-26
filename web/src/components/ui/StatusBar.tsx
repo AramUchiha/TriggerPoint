@@ -8,7 +8,7 @@ export function StatusBar() {
         <div className="min-w-0 leading-tight">
           <h1 className="text-lg font-bold tracking-tight text-slate-50">Trigger Point</h1>
           <p className="hidden truncate text-xs text-slate-400 lg:block">
-            Glendale Fire Department · Wildfire evacuation pre-incident planning
+            Wildfire reports and where to go · Glendale canyons
           </p>
         </div>
       </div>
@@ -18,11 +18,8 @@ export function StatusBar() {
           role="note"
           className="truncate rounded-full border border-warning/50 bg-warning/10 px-3 py-1 text-xs font-semibold tracking-wide text-warning sm:text-sm"
         >
-          PLANNING SCENARIO
-          <span className="font-medium">
-            {" — "}
-            <span className="hidden lg:inline">experimental projection, </span>not a forecast
-          </span>
+          PROJECTION
+          <span className="font-medium">{" — "}not a forecast</span>
         </p>
       </div>
 

@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Map, { Layer, NavigationControl, Source, type MapEvent } from "react-map-gl/maplibre";
 import {
   BASEMAP_STYLE_URL,
@@ -14,10 +14,6 @@ import {
   TERRAIN_SOURCE_ID,
   TERRAIN_TILES,
 } from "@/config/map";
-import { useAppStore } from "@/store/app-store";
-import { CameraController } from "./CameraController";
-import { DeckOverlay } from "./DeckOverlay";
-import { buildScenarioLayers } from "./scenario-layers";
 
 const TERRAIN = { source: TERRAIN_SOURCE_ID, exaggeration: TERRAIN_EXAGGERATION };
 
@@ -32,9 +28,6 @@ export default function MapView() {
   // Looked up at load time so any basemap style works without hard-coded layer ids.
   const [labelLayerId, setLabelLayerId] = useState<string | undefined>();
   const [styleReady, setStyleReady] = useState(false);
-
-  const visibility = useAppStore((s) => s.layers);
-  const layers = useMemo(() => buildScenarioLayers(visibility), [visibility]);
 
   const handleLoad = (e: MapEvent) => {
     setLabelLayerId(e.target.getStyle().layers.find((l) => l.type === "symbol")?.id);
@@ -69,8 +62,6 @@ export default function MapView() {
         />
       )}
       <NavigationControl position="top-left" visualizePitch />
-      <DeckOverlay layers={layers} />
-      <CameraController />
     </Map>
   );
 }
